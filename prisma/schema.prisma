@@ -1,0 +1,235 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "../src/generated/prisma"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  PRIVATE
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  username     String    @unique
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  nickname     String?
+  avatar       String?
+  bio          String?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  articles     Article[]
+  comments     Comment[]
+
+  @@map("users")
+}
+
+model Article {
+  id          Int       @id @default(autoincrement())
+  title       String
+  content     String
+  summary     String?
+  coverImage  String?   @map("cover_image")
+  authorId    Int       @map("author_id")
+  categoryId  Int?      @map("category_id")
+  status      ArticleStatus @default(DRAFT)
+  publishedAt DateTime? @map("published_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  comments    Comment[]  @relation("ArticleComments")
+  histories   ArticleHistory[]
+
+  @@index([authorId, createdAt, id])
+  @@index([status, publishedAt, id])
+  @@map("articles")
+}
+
+model ArticleHistory {
+  id           Int           @id @default(autoincrement())
+  articleId    Int           @map("article_id")
+  name         String
+  title        String
+  content      String
+  summary      String?
+  coverImage   String?       @map("cover_image")
+  categoryId   Int?          @map("category_id")
+  categoryName String?       @map("category_name")
+  status       ArticleStatus
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  article      Article       @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@index([articleId, createdAt, id])
+  @@map("article_histories")
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  slug      String?   @unique
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  articles  Article[]
+
+  @@map("categories")
+}
+
+model Comment {
+  id           Int       @id @default(autoincrement())
+  content      String
+  articleId    Int?      @map("article_id")
+  memoId       Int?      @map("memo_id")
+  authorId     Int?      @map("author_id")
+  guestName    String?   @map("guest_name")
+  guestEmail   String?   @map("guest_email")
+  guestWebsite String?   @map("guest_website")
+  parentId     Int?      @map("parent_id")
+  isApproved   Boolean   @default(true) @map("is_approved")
+  ipAddress    String?   @map("ip_address")
+  userAgent    String?   @map("user_agent")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  article      Article?  @relation("ArticleComments", fields: [articleId], references: [id], onDelete: Cascade)
+  memo         Memo?     @relation("MemoComments", fields: [memoId], references: [id], onDelete: Cascade)
+  author       User?     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent       Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies      Comment[] @relation("CommentReplies")
+
+  @@index([articleId, isApproved, createdAt])
+  @@index([memoId, isApproved, createdAt])
+  @@index([parentId, createdAt])
+  @@map("comments")
+}
+
+model Config {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("configs")
+}
+
+model Link {
+  id        Int      @id @default(autoincrement())
+  name      String
+  url       String
+  avatarUrl String?  @map("avatar_url")
+  category  String   @default("friend")
+  sortOrder Int      @default(0) @map("sort_order")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([isActive, sortOrder, createdAt])
+  @@map("links")
+}
+
+model VisitLog {
+  id          Int      @id @default(autoincrement())
+  path        String
+  title       String?
+  referrer    String?
+  ipAddress   String   @map("ip_address")
+  userAgent   String?  @map("user_agent")
+  deviceType  String   @default("unknown") @map("device_type")
+  browser     String   @default("unknown")
+  os          String   @default("unknown")
+  visitorKey  String   @map("visitor_key")
+  countryCode String?  @map("country_code")
+  countryName String?  @map("country_name")
+  regionName  String?  @map("region_name")
+  cityName    String?  @map("city_name")
+  visitedAt   DateTime @default(now()) @map("visited_at")
+
+  @@index([visitedAt])
+  @@index([visitorKey, visitedAt])
+  @@index([path, visitedAt])
+  @@index([deviceType, visitedAt])
+  @@index([countryName, visitedAt])
+  @@index([regionName, visitedAt])
+  @@index([cityName, visitedAt])
+  @@map("visit_logs")
+}
+
+model Memo {
+  id          Int      @id @default(autoincrement())
+  content     String
+  isPublished Boolean  @default(false) @map("is_published")
+  source      String?
+  sourceMessageId String? @unique @map("source_message_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  sourceMessages MemoSourceMessage[]
+  comments    Comment[] @relation("MemoComments")
+
+  @@index([isPublished, createdAt])
+  @@map("memos")
+}
+
+model MemoSourceMessage {
+  id                    Int      @id @default(autoincrement())
+  memoId                Int      @map("memo_id")
+  sourceMessageId       String   @unique @map("source_message_id")
+  parentSourceMessageId String?  @map("parent_source_message_id")
+  rootSourceMessageId   String?  @map("root_source_message_id")
+  createdAt             DateTime @default(now()) @map("created_at")
+  memo                  Memo     @relation(fields: [memoId], references: [id], onDelete: Cascade)
+
+  @@index([memoId, createdAt])
+  @@index([parentSourceMessageId])
+  @@index([rootSourceMessageId])
+  @@map("memo_source_messages")
+}
+
+model UploadFile {
+  id           Int      @id @default(autoincrement())
+  relativePath String   @unique @map("relative_path")
+  originalName String   @map("original_name")
+  mimeType     String?  @map("mime_type")
+  size         Int
+  isMissing    Boolean  @default(false) @map("is_missing")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  albumImages  AlbumImage[]
+
+  @@map("files")
+}
+
+model Album {
+  id          Int          @id @default(autoincrement())
+  title       String
+  description String?
+  isPublic    Boolean      @default(true) @map("is_public")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  images      AlbumImage[]
+
+  @@index([isPublic, createdAt, id])
+  @@map("albums")
+}
+
+model AlbumImage {
+  id        Int        @id @default(autoincrement())
+  albumId   Int        @map("album_id")
+  fileId    Int        @map("file_id")
+  sortOrder Int        @default(0) @map("sort_order")
+  createdAt DateTime   @default(now()) @map("created_at")
+  album     Album      @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  file      UploadFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@unique([albumId, fileId])
+  @@index([albumId, sortOrder, id])
+  @@index([fileId])
+  @@map("album_images")
+}

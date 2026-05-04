@@ -1,0 +1,813 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@import "highlight.js/styles/github.css";
+
+@theme inline {
+  --font-sans: system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.memoir-page-transition {
+  animation: page-enter 220ms ease-out both;
+  will-change: opacity, transform;
+}
+
+.memoir-interactive-row {
+  transition: transform 180ms ease-out, color 180ms ease-out;
+}
+
+.memoir-interactive-row:hover {
+  transform: translateX(3px);
+}
+
+.memoir-image-link {
+  transition: border-color 180ms ease-out, transform 180ms ease-out;
+}
+
+.memoir-image-link:hover {
+  border-color: #10b981;
+  transform: translateY(-2px);
+}
+
+.memoir-image-link img {
+  transition: transform 240ms ease-out;
+}
+
+.memoir-image-link:hover img {
+  transform: scale(1.02);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .memoir-page-transition {
+    animation: none;
+  }
+
+  .memoir-interactive-row:hover,
+  .memoir-image-link:hover,
+  .memoir-image-link:hover img {
+    transform: none;
+  }
+}
+
+.prose {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.9rem;
+}
+
+.memoir-site .prose {
+  font-size: 1rem;
+}
+
+@media (min-width: 640px) {
+  .prose {
+    font-size: 1rem;
+  }
+
+  .memoir-site .prose {
+    font-size: 1.05rem;
+  }
+}
+
+.prose pre {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-left: 3px solid #10b981;
+  border-radius: 0;
+  overflow-x: auto;
+  max-width: 100%;
+  color: #111827;
+}
+
+.prose code {
+  background: #f1f5f9;
+  padding: 0.125rem 0.375rem;
+  border-radius: 2px;
+  font-size: 0.9em;
+  color: #0284c7;
+  word-break: break-word;
+}
+
+.prose code::before,
+.prose code::after {
+  content: none;
+}
+
+.prose pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.prose blockquote {
+  border-left: 3px solid #10b981;
+  color: #6b7280;
+  font-style: normal;
+}
+
+.prose a:not(.memoir-link-preview) {
+  color: #0284c7;
+  text-decoration: none;
+}
+
+.prose a:not(.memoir-link-preview):hover {
+  text-decoration: underline;
+}
+
+@keyframes progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.animate-progress {
+  animation: progress linear forwards;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: #9ca3af;
+}
+
+.image-gallery img {
+  margin: 0 !important;
+}
+
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.9);
+  animation: lightbox-fade-in 0.2s ease-out;
+}
+
+@keyframes lightbox-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lightbox-overlay img {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* =========================
+   Admin (scoped by .memoir-admin)
+   ========================= */
+
+.memoir-admin {
+  background: linear-gradient(180deg, #f8fafc 0%, #f3f4f6 100%);
+  color: #0f172a;
+}
+
+.memoir-admin a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.memoir-admin a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.memoir-admin .memoir-admin-content {
+  border: 0;
+  box-shadow: none;
+}
+
+.memoir-admin .ant-card {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+.memoir-admin .ant-card-hoverable:hover {
+  border-color: rgba(148, 163, 184, 0.2);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.07);
+}
+
+.memoir-admin .ant-table-container {
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.memoir-admin .ant-table-thead > tr > th {
+  background: #f8fafc;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.memoir-admin .ant-table-tbody > tr > td {
+  border-color: #eef2f7;
+}
+
+.memoir-admin .ant-table-wrapper .ant-table {
+  background: transparent;
+}
+
+.memoir-admin .ant-table-wrapper .ant-table-cell,
+.memoir-admin .ant-table-wrapper .ant-table-thead > tr > th {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.memoir-admin .ant-menu {
+  background: transparent;
+}
+
+.memoir-admin .memoir-visit-rank-item {
+  container-type: inline-size;
+}
+
+.memoir-admin .memoir-visit-rank-path {
+  max-width: min(46%, 280px);
+  flex: 0 1 auto;
+}
+
+@container (max-width: 520px) {
+  .memoir-admin .memoir-visit-rank-path {
+    display: none;
+  }
+}
+
+.memoir-install,
+.memoir-install-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(135deg, rgba(14, 165, 233, 0.12), transparent 32%),
+    linear-gradient(315deg, rgba(16, 185, 129, 0.14), transparent 34%),
+    #f6f7f9;
+  padding: 40px 20px;
+}
+
+.memoir-install-shell {
+  width: min(1120px, 100%);
+  height: min(820px, calc(100vh - 80px));
+  min-height: 640px;
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.memoir-install-aside,
+.memoir-install-card {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.1);
+}
+
+.memoir-install-aside {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 48px;
+  padding: 34px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #111827;
+  color: #f9fafb;
+}
+
+.memoir-install-aside .ant-steps {
+  color: inherit;
+}
+
+.memoir-install-aside .ant-steps-item-title,
+.memoir-install-aside .ant-steps-item-description {
+  color: rgba(255, 255, 255, 0.86) !important;
+}
+
+.memoir-install-aside .ant-steps-item-wait .ant-steps-item-title,
+.memoir-install-aside .ant-steps-item-wait .ant-steps-item-description {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.memoir-install-aside .ant-steps-item-icon {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.memoir-install-aside .ant-steps-item-process .ant-steps-item-icon {
+  background: #ffffff;
+  border-color: #ffffff;
+}
+
+.memoir-install-logo {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 22px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 24px;
+}
+
+.memoir-install-card {
+  min-height: 0;
+  border-radius: 18px;
+}
+
+.memoir-install-card .ant-card-body {
+  height: 100%;
+  padding: 28px;
+}
+
+.memoir-install-form {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.memoir-install-heading {
+  width: 100%;
+}
+
+.memoir-install-heading .ant-typography {
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 0;
+}
+
+.memoir-install-heading h1.ant-typography {
+  color: #ffffff;
+  margin: 0;
+  font-size: 38px;
+  line-height: 1.12;
+  letter-spacing: 0;
+}
+
+.memoir-install-kicker {
+  color: rgba(255, 255, 255, 0.62) !important;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.memoir-install-alert {
+  flex: 0 0 auto;
+  margin-bottom: 24px;
+  border-radius: 12px;
+}
+
+.memoir-install-form-body {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.memoir-install-section {
+  min-height: 100%;
+}
+
+.memoir-install-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.memoir-install-section-header h3.ant-typography {
+  margin: 0;
+}
+
+.memoir-install-section-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #f0f9ff;
+  color: #0369a1;
+  font-size: 20px;
+}
+
+.memoir-install-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.memoir-install-divider {
+  flex: 0 0 auto;
+  margin: 20px 0 24px;
+}
+
+.memoir-install-actions {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.memoir-install-actions .ant-btn-primary {
+  min-width: 132px;
+}
+
+.memoir-install-summary {
+  display: grid;
+  gap: 16px;
+}
+
+.memoir-install-summary-block {
+  padding: 18px;
+  border: 1px solid #eef2f7;
+  border-radius: 14px;
+  background: #fafafa;
+}
+
+.memoir-install-summary-block dl {
+  margin: 14px 0 0;
+}
+
+.memoir-install-summary-block dl > div {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid #edf2f7;
+}
+
+.memoir-install-summary-block dl > div:first-child {
+  border-top: 0;
+}
+
+.memoir-install-summary-block dt {
+  color: #6b7280;
+}
+
+.memoir-install-summary-block dd {
+  min-width: 0;
+  margin: 0;
+  color: #111827;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  .memoir-install {
+    align-items: flex-start;
+  }
+
+  .memoir-install-shell {
+    height: auto;
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .memoir-install-aside {
+    gap: 28px;
+  }
+
+  .memoir-install-aside .ant-steps {
+    display: none;
+  }
+
+  .memoir-install-card {
+    min-height: auto;
+  }
+
+  .memoir-install-card .ant-card-body,
+  .memoir-install-form {
+    height: auto;
+  }
+
+  .memoir-install-form-body {
+    overflow: visible;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .memoir-install,
+  .memoir-install-loading {
+    padding: 20px 12px;
+  }
+
+  .memoir-install-aside,
+  .memoir-install-card .ant-card-body {
+    padding: 22px;
+  }
+
+  .memoir-install-heading h1.ant-typography {
+    font-size: 30px;
+  }
+
+  .memoir-install-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .memoir-install-section {
+    min-height: auto;
+  }
+
+  .memoir-install-actions {
+    flex-direction: column-reverse;
+  }
+
+  .memoir-install-actions .ant-btn {
+    width: 100%;
+  }
+}
+
+.memoir-admin .memoir-admin-menu .ant-menu-item-group-title {
+  padding: 12px 16px 6px;
+  margin: 8px 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: 0.06em;
+}
+
+.memoir-admin .memoir-admin-menu.ant-menu-inline .ant-menu-item {
+  margin: 4px 10px;
+  width: calc(100% - 20px);
+  border-radius: 14px;
+}
+
+.memoir-admin .memoir-admin-menu .ant-menu-item::after {
+  border-right: none;
+}
+
+.memoir-admin .memoir-admin-menu .ant-menu-item-selected {
+  font-weight: 600;
+  color: #111827;
+}
+
+.memoir-admin .memoir-admin-menu.ant-menu-inline-collapsed .ant-menu-item-group-title {
+  display: none;
+}
+
+.memoir-admin .memoir-admin-menu.ant-menu-inline-collapsed .ant-menu-item {
+  margin: 4px;
+  width: calc(100% - 8px);
+}
+
+.memoir-admin .memoir-admin-sider {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(16px);
+}
+
+.memoir-admin .memoir-admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+@media (max-width: 767px) {
+  .memoir-admin {
+    background: #f3f4f6;
+  }
+
+  .memoir-admin .ant-card {
+    border-radius: 12px;
+  }
+
+  .memoir-admin .ant-card .ant-card-body {
+    padding: 16px;
+  }
+
+  .memoir-admin .ant-table-wrapper {
+    max-width: 100%;
+  }
+
+  .memoir-admin .ant-table-wrapper .ant-table-cell,
+  .memoir-admin .ant-table-wrapper .ant-table-thead > tr > th {
+    padding: 10px 12px;
+  }
+
+  .memoir-admin .ant-pagination {
+    justify-content: flex-start;
+  }
+
+  .memoir-admin .ant-pagination-options-quick-jumper {
+    display: none;
+  }
+
+  .memoir-admin .ant-space {
+    max-width: 100%;
+  }
+
+  .memoir-admin .ant-space-item {
+    max-width: 100%;
+  }
+
+  .memoir-admin .ant-form-item {
+    margin-bottom: 14px;
+  }
+
+  .memoir-admin .memoir-admin-page-header {
+    align-items: flex-start !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .memoir-admin .memoir-admin-page-header > .ant-btn,
+  .memoir-admin .memoir-admin-page-header > .ant-space {
+    align-self: stretch;
+  }
+
+  .memoir-admin .memoir-admin-toolbar {
+    display: flex !important;
+    width: 100%;
+  }
+
+  .memoir-admin .memoir-admin-toolbar .ant-input,
+  .memoir-admin .memoir-admin-toolbar .ant-input-affix-wrapper,
+  .memoir-admin .memoir-admin-toolbar .ant-input-search,
+  .memoir-admin .memoir-admin-toolbar .ant-select,
+  .memoir-admin .memoir-admin-toolbar .ant-picker {
+    width: 100% !important;
+  }
+
+  .memoir-admin .memoir-admin-toolbar .ant-space-item:has(.ant-input),
+  .memoir-admin .memoir-admin-toolbar .ant-space-item:has(.ant-input-affix-wrapper),
+  .memoir-admin .memoir-admin-toolbar .ant-space-item:has(.ant-input-search) {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .memoir-admin .memoir-admin-article-editor {
+    min-height: auto !important;
+    overflow: visible;
+  }
+
+  .memoir-admin .memoir-admin-article-editor-page {
+    height: auto !important;
+    min-height: 100%;
+    overflow: visible !important;
+  }
+
+  .memoir-admin .memoir-admin-article-editor-header {
+    align-items: flex-start !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .memoir-admin .memoir-admin-article-editor-actions {
+    width: 100%;
+  }
+
+  .memoir-admin .memoir-admin-article-editor-body {
+    flex-direction: column;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  .memoir-admin .memoir-admin-article-editor-main {
+    min-height: 520px !important;
+  }
+
+  .memoir-admin .memoir-admin-article-editor-sidebar {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: none !important;
+    overflow: visible !important;
+    padding-right: 0 !important;
+  }
+
+  .memoir-admin .memoir-markdown-editor-toolbar {
+    align-items: flex-start !important;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .memoir-admin .memoir-markdown-editor-toolbar-extra {
+    display: none;
+  }
+
+  .memoir-admin .memoir-markdown-editor-pane {
+    flex-direction: column;
+  }
+
+  .memoir-admin .memoir-markdown-editor-input-pane {
+    min-height: 280px;
+  }
+
+  .memoir-admin .memoir-markdown-editor-preview-pane {
+    min-height: 220px;
+    border-left: 0 !important;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .memoir-admin .memoir-admin-album-file-picker {
+    grid-template-columns: 1fr !important;
+  }
+
+  .memoir-admin .memoir-admin-file-preview {
+    flex-direction: column;
+  }
+
+  .memoir-admin .memoir-admin-file-preview-media {
+    width: 100% !important;
+    height: min(62vw, 280px) !important;
+    flex: none !important;
+  }
+
+  .memoir-admin .memoir-admin-file-preview-info {
+    width: 100%;
+  }
+
+  .memoir-admin .ant-row {
+    row-gap: 12px;
+  }
+
+  .memoir-admin .ant-col {
+    max-width: 100%;
+  }
+
+  .memoir-admin-mobile-drawer .ant-drawer-header {
+    padding: 14px 16px;
+  }
+
+  .memoir-admin-mobile-drawer .memoir-admin-menu .ant-menu-item-group-title {
+    padding: 12px 16px 6px;
+    margin: 8px 0 2px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    letter-spacing: 0.06em;
+  }
+}
+
+@media (max-width: 767px) {
+  .ant-modal {
+    top: 12px;
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px);
+    margin: 0 auto;
+  }
+
+  .ant-modal .ant-modal-content {
+    max-height: calc(100vh - 24px);
+    overflow: auto;
+  }
+
+  .ant-modal .ant-modal-body {
+    max-width: 100%;
+  }
+}

@@ -1,0 +1,9 @@
+services:
+  app:
+    image: ghcr.io/shiyu/memoir:latest
+    container_name: memoir
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
