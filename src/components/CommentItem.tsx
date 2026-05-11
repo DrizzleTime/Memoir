@@ -126,7 +126,7 @@ export default function CommentItem({
               const replyWebsite = getValidUrl(reply.guest_website);
               const replyToName = reply.parent_id ? nameMap.get(reply.parent_id) || "匿名" : null;
 
-              const replyAvatarElement = <Avatar email={replyEmail} name={replyAuthorName} size={32} />;
+              const replyAvatarElement = <Avatar email={replyEmail} name={replyAuthorName} size={36} />;
               const replyNameElement = (
                 <span
                   className={`font-medium ${replyWebsite ? "text-neutral-800 hover:text-blue-600 hover:underline" : "text-neutral-800"}`}
