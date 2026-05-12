@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { Readable } from "stream";
 import { pipeline } from "stream/promises";
+import type { ReadableStream as NodeReadableStream } from "stream/web";
 import { prisma } from "@/lib/prisma";
 import { convertToWebp, isConvertibleImage } from "@/lib/webp";
 
@@ -88,7 +89,11 @@ export async function saveWebFileAsUploadFile(
 ): Promise<UploadedFileResult> {
   return saveUploadFile({
     writeFile: async (absolutePath) => {
-      await pipeline(Readable.fromWeb(file.stream()), fs.createWriteStream(absolutePath));
+      const stream = file.stream() as unknown as NodeReadableStream<Uint8Array>;
+      await pipeline(
+        Readable.fromWeb(stream),
+        fs.createWriteStream(absolutePath)
+      );
     },
     originalName: file.name,
     mimeType: file.type || null,
