@@ -1,6 +1,8 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
+import { Readable } from "stream";
+import { pipeline } from "stream/promises";
 import { prisma } from "@/lib/prisma";
 import { convertToWebp, isConvertibleImage } from "@/lib/webp";
 
@@ -28,6 +30,22 @@ export async function saveBufferAsUploadFile(params: {
   originalName: string;
   mimeType?: string | null;
 }): Promise<UploadedFileResult> {
+  return saveUploadFile({
+    writeFile: async (absolutePath) => {
+      await fs.promises.writeFile(absolutePath, params.buffer);
+    },
+    originalName: params.originalName,
+    mimeType: params.mimeType,
+    size: params.buffer.length,
+  });
+}
+
+async function saveUploadFile(params: {
+  writeFile: (absolutePath: string) => Promise<void>;
+  originalName: string;
+  mimeType?: string | null;
+  size: number;
+}): Promise<UploadedFileResult> {
   const { year, month } = getYearMonth();
   const ext = path.extname(params.originalName);
   const savedName = `${crypto.randomUUID()}${ext}`;
@@ -37,7 +55,7 @@ export async function saveBufferAsUploadFile(params: {
   fs.mkdirSync(uploadsDir, { recursive: true });
 
   const absolutePath = path.join(uploadsDir, savedName);
-  fs.writeFileSync(absolutePath, params.buffer);
+  await params.writeFile(absolutePath);
 
   let webpRelativePath: string | null = null;
   if (isConvertibleImage(absolutePath)) {
@@ -53,7 +71,7 @@ export async function saveBufferAsUploadFile(params: {
       relativePath,
       originalName: params.originalName,
       mimeType: params.mimeType || null,
-      size: params.buffer.length,
+      size: params.size,
       isMissing: false,
     },
   });
@@ -66,13 +84,14 @@ export async function saveBufferAsUploadFile(params: {
 }
 
 export async function saveWebFileAsUploadFile(
-  file: Pick<File, "name" | "type" | "arrayBuffer">
+  file: Pick<File, "name" | "type" | "size" | "stream">
 ): Promise<UploadedFileResult> {
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  return saveBufferAsUploadFile({
-    buffer,
+  return saveUploadFile({
+    writeFile: async (absolutePath) => {
+      await pipeline(Readable.fromWeb(file.stream()), fs.createWriteStream(absolutePath));
+    },
     originalName: file.name,
     mimeType: file.type || null,
+    size: file.size,
   });
 }

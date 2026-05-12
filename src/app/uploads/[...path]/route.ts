@@ -8,6 +8,7 @@ import {
 } from "@/lib/webp";
 import fs from "fs";
 import path from "path";
+import { Readable } from "stream";
 
 const MIME_TYPES: Record<string, string> = {
   ".html": "text/html",
@@ -92,13 +93,14 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const file = fs.readFileSync(resolvedPath);
+  const file = Readable.toWeb(fs.createReadStream(resolvedPath)) as ReadableStream;
   const ext = path.extname(resolvedPath).toLowerCase();
   const contentType = MIME_TYPES[ext] || "application/octet-stream";
 
   return new NextResponse(file, {
     headers: {
       "Content-Type": contentType,
+      "Content-Length": String(stat.size),
       "Cache-Control": "public, max-age=31536000, immutable",
       // 告诉 CDN/代理根据 Accept 头缓存不同版本
       "Vary": "Accept",

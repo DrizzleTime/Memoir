@@ -2,6 +2,9 @@ import sharp from "sharp";
 import fs from "fs";
 import path from "path";
 
+sharp.cache(false);
+sharp.concurrency(1);
+
 /**
  * 支持转换为 WebP 的图片扩展名
  */

@@ -10,6 +10,7 @@ export interface LinkPreview {
 }
 
 const previewCache = new Map<string, LinkPreview>();
+const PREVIEW_CACHE_MAX_SIZE = 200;
 
 const USER_AGENT =
   "Mozilla/5.0 (compatible; MemoirLinkPreview/1.0; +https://localhost)";
@@ -58,11 +59,21 @@ export async function getLinkPreview(urlInput: string): Promise<LinkPreview> {
     preview.title = clampText(preview.title, 120);
     preview.description = clampText(preview.description, 200);
 
-    previewCache.set(normalizedUrl, preview);
+    setPreviewCache(normalizedUrl, preview);
     return preview;
   } finally {
     clearTimeout(timer);
   }
+}
+
+function setPreviewCache(url: string, preview: LinkPreview) {
+  if (previewCache.size >= PREVIEW_CACHE_MAX_SIZE) {
+    const oldestKey = previewCache.keys().next().value;
+    if (oldestKey) {
+      previewCache.delete(oldestKey);
+    }
+  }
+  previewCache.set(url, preview);
 }
 
 type ParsedMeta = {
